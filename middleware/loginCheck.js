@@ -1,7 +1,6 @@
 const { ErrorModel } = require('../model/resModel')
 
-module.exports = async (ctx, next) => {
-    console.log(ctx.session)
+module.exports = async (ctx, next) => { // 检查登录状态
     if (ctx.session.h_username) {
         await next()
         return

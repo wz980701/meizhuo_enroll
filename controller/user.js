@@ -1,6 +1,6 @@
 const { exec } = require('../db/mysql')
 
-const Login = async (username, password) => {
+const Login = async (username, password) => {   // 面试官登录
     let sql = `
     select h_username from interviewer where h_username=${username} and h_password=${password};
     `
