@@ -8,7 +8,9 @@ const logger = require('koa-logger')
 const session = require('koa-generic-session')
 const redisStore = require('koa-redis')
 
+const interview = require('./routes/interview')
 const user = require('./routes/user')
+
 const { REDIS_CONF } = require('./conf/db')
 
 // error handler
@@ -51,6 +53,7 @@ app.use(session({
 }))
 
 // routes
+app.use(interview.routes(), interview.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 
 // error-handling

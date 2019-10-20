@@ -1,20 +1,24 @@
 const { exec } = require('../db/mysql')
 
-const Login = async (username, password) => {   // 面试官登录
-    let sql = `
-    select h_username from interviewer where h_username=${username} and h_password=${password};
-    `
-    const data = await exec(sql)
-    return data[0] || {}
-}
+const { _timeToTimestamp } = require('../utils/_common')
 
-const getList = async () => {
-    let sql = 'select * from state'
+const addUser = async (user_data) => {  // 面试者报名
+    let sql = `
+        insert into user 
+        (s_name, s_id, s_major, s_number, s_grade, s_department, s_intro, s_createtime)
+        values (
+    `
+    Object.keys(user_data).forEach((key) => {
+        sql += `${user_data[key]},`
+    })
+    sql += `${_timeToTimestamp()});`
     const data = await exec(sql)
-    return data
+    if (data.affectedRows > 0) {
+        return true
+    }
+    return false
 }
 
 module.exports = {
-    Login,
-    getList
+    addUser
 }
