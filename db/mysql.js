@@ -2,13 +2,7 @@ const mysql = require('mysql')
 
 const { MYSQL_CONF } = require('../conf/db')
 
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '123456',
-    port: '3306',
-    database: 'meizhuo_enroll'
-})  // 建立连接
+const con = mysql.createConnection(MYSQL_CONF)  // 建立连接
 
 con.connect()   // 开始连接
 

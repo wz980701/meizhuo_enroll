@@ -1,11 +1,20 @@
 const { exec } = require('../db/mysql')
 
-const getUser = async () => {
-    let sql = `select * from interviewer;`
+const Login = async (username, password) => {
+    let sql = `
+    select h_username from interviewer where h_username=${username} and h_password=${password};
+    `
+    const data = await exec(sql)
+    return data[0] || {}
+}
+
+const getList = async () => {
+    let sql = 'select * from state'
     const data = await exec(sql)
     return data
 }
 
 module.exports = {
-    getUser
+    Login,
+    getList
 }
