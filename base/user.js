@@ -1,5 +1,8 @@
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-const { addUser } = require('../controller/user')
+const { 
+    addUser,
+    getList
+} = require('../controller/user')
 const { _deepCopy } = require('../utils/_common')
 
 class User {
@@ -13,6 +16,14 @@ class User {
             ctx.body = new SuccessModel('报名成功')
         } else {
             ctx.body = new ErrorModel('报名失败')
+        }
+    }
+    async list (ctx, next) {
+        const val = await getList(ctx.query)
+        if (val) {
+            ctx.body = new SuccessModel(val, '获取成功')
+        } else {
+            ctx.body = new ErrorModel('获取失败')
         }
     }
 }
