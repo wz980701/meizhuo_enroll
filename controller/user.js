@@ -2,7 +2,7 @@ const { exec } = require('../db/mysql')
 
 const { _timeToTimestamp } = require('../utils/_common')
 
-const addUser = async (user_data) => {  // 面试者报名
+const addUser = async (user_data) => {  // 面试者线上报名
     let sql = `
         insert into user 
         (s_name, s_id, s_major, s_number, s_grade, s_department, s_intro, s_createtime)
@@ -51,8 +51,36 @@ const getDetail = async (id) => {
     return user_detail[0] || {}
 }
 
+const toSignIn = async (id) => {
+    let sql = `
+        update user set s_state='已签到' where s_id=${id};
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) {
+        return true
+    }
+    return false
+}
+
+const addOfflineUser = async ({name, id, group}) => {
+    let sql = `
+        insert into user
+        (s_name, s_id, s_department, s_createtime, s_state, s_apply)
+        values (
+            ${name}, ${id}, ${group}, ${_timeToTimestamp()}, '已签到', '线下报名'
+        );
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) {
+        return true
+    }
+    return false
+}
+
 module.exports = {
     addUser,
     getList,
-    getDetail
+    getDetail,
+    toSignIn,
+    addOfflineUser
 }

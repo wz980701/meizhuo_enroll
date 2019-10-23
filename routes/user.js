@@ -9,6 +9,8 @@ router.post('/apply', User.apply)   // 面试者报名
 
 router.get('/list', loginCheck, User.list)  // 获取面试者列表
 
-router.get('/detail', User.detail)  // 获取面试者详情
+router.get('/detail', loginCheck, User.detail)  // 获取面试者详情
+
+router.post('/sign', User.signIn) // 面试者签到
 
 module.exports = router
