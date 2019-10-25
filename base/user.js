@@ -6,7 +6,8 @@ const {
     checkUser,
     toSignIn,
     addOfflineUser,
-    getSignList
+    getSignList,
+    delFromSignList
 } = require('../controller/user')
 const { _deepCopy, _returnVal } = require('../utils/_common')
 
@@ -70,6 +71,14 @@ class User {
             passData: true,
             successMsg: '获取成功',
             failMsg: '获取失败',
+            data: val
+        })
+    }
+    async delSignUser (ctx, next) {
+        const val = await delFromSignList(ctx.query.id)
+        ctx.body = _returnVal({
+            successMsg: '删除成功',
+            failMsg: '删除失败',
             data: val
         })
     }

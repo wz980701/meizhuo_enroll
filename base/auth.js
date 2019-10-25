@@ -1,6 +1,6 @@
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const {
-    ToLogin
+    toLogin
 } = require('../controller/auth')
 
 class Auth {

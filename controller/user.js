@@ -44,7 +44,7 @@ const getList = async ({ group, page = 1, limit = 20, state }) => {
 const getDetail = async (id) => {
     let sql = `
         select
-        s_id, s_name, s_major, s_grade, s_department, s_number, s_intro
+        s_id, s_name, s_major, s_grade, s_department, s_number, s_intro, s_apply, s_state
         from user where id=${id};
     `
     const user_detail = await exec(sql)
@@ -113,6 +113,17 @@ const getDepartmentList = async () => {
     return data || []
 }
 
+const delFromSignList = async (id) => {
+    let sql = `
+        delete from sign_list where s_id=${id};
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) {
+        return true
+    }
+    return false
+}
+
 module.exports = {
     addUser,
     getList,
@@ -120,5 +131,6 @@ module.exports = {
     checkUser,
     toSignIn,
     addOfflineUser,
-    getSignList
+    getSignList,
+    delFromSignList
 }

@@ -11,6 +11,7 @@ const redisStore = require('koa-redis')
 
 const auth = require('./routes/auth')
 const user = require('./routes/user')
+const interview = require('./routes/interview')
 
 const { REDIS_CONF } = require('./conf/db')
 
@@ -57,6 +58,7 @@ app.use(session({
 // routes
 app.use(auth.routes(), auth.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
+app.use(interview.routes(), interview.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {

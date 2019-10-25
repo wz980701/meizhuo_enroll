@@ -15,4 +15,6 @@ router.post('/sign', User.signIn) // 面试者签到
 
 router.get('/sign/list', User.signList)     // 获取签到者列表
 
+router.get('/sign/del', User.delSignUser)   // 删除签到者
+
 module.exports = router
