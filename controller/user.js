@@ -37,7 +37,7 @@ const getList = async ({ group, page = 1, limit = 20, state }) => {
     const user_num = await exec(sql_2)
     return {
         user_list,
-        sum: user_num[0].sum
+        sum: user_num[0].sum || 0
     }
 }
 
@@ -51,9 +51,24 @@ const getDetail = async (id) => {
     return user_detail[0] || {}
 }
 
-const toSignIn = async (id) => {
+const checkUser = async (id) => {
     let sql = `
         update user set s_state='已签到' where s_id=${id};
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) {
+        return true
+    }
+    return false
+}
+
+const toSignIn = async (id) => {
+    let sql = `
+        insert into sign_list
+        (s_department, s_name, s_id, s_state)
+        select 
+        s_department, s_name, s_id, s_state
+        from user where s_id=${id};
     `
     const data = await exec(sql)
     if (data.affectedRows > 0) {
@@ -77,10 +92,33 @@ const addOfflineUser = async ({name, id, group}) => {
     return false
 }
 
+const getSignList = async () => {
+    const keys = await getDepartmentList()
+    let data = {}
+    for (let item of keys) {    //  遍历组别列表
+        let sql = `
+            select s_id, s_name, s_state from sign_list where s_department='${item.d_name}';
+        `
+        const val = await exec(sql) // 根据所报组别不同获取列表
+        data[item.d_name] = val
+    }
+    return data
+}
+
+const getDepartmentList = async () => {
+    let sql = `
+        select d_name from department;
+    `
+    const data = await exec(sql)
+    return data || []
+}
+
 module.exports = {
     addUser,
     getList,
     getDetail,
+    checkUser,
     toSignIn,
-    addOfflineUser
+    addOfflineUser,
+    getSignList
 }

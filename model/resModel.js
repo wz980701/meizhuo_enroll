@@ -14,7 +14,7 @@ class BaseModel {
     }
 }
 
-// 成功则状态码为1， 否则为0
+// 成功则状态码为1
 class SuccessModel extends BaseModel {
     constructor (data, message) {
         super(data, message)
@@ -22,6 +22,7 @@ class SuccessModel extends BaseModel {
     }
 }
 
+// 一般错误状态码为0
 class ErrorModel extends BaseModel {
     constructor (data, message) {
         super(data, message)

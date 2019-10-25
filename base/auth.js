@@ -1,13 +1,10 @@
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const {
-    ToLogin,
-    getList
-} = require('../controller/interview')
+    ToLogin
+} = require('../controller/auth')
 
-class Interview {
+class Auth {
     constructor () {
-        this.login.bind(this)
-        this.list.bind(this)
     }
     async login (ctx, next) {
         const { username, password } = ctx.request.body
@@ -19,14 +16,6 @@ class Interview {
         }
         ctx.body = new ErrorModel('登录失败')
     }
-    async list (ctx, next) {
-        const data = await getList()
-        if (data) {
-            ctx.body = new SuccessModel('获取成功')
-        } else {
-            ctx.body = new ErrorModel('获取失败')
-        }
-    }
 }
 
-module.exports = new Interview()
+module.exports = new Auth()

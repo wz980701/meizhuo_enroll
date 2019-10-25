@@ -13,4 +13,6 @@ router.get('/detail', loginCheck, User.detail)  // 获取面试者详情
 
 router.post('/sign', User.signIn) // 面试者签到
 
+router.get('/sign/list', User.signList)     // 获取签到者列表
+
 module.exports = router

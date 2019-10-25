@@ -4,11 +4,12 @@ const views = require('koa-views')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
+const koaBody = require('koa-body')
 const logger = require('koa-logger')
 const session = require('koa-generic-session')
 const redisStore = require('koa-redis')
 
-const interview = require('./routes/interview')
+const auth = require('./routes/auth')
 const user = require('./routes/user')
 
 const { REDIS_CONF } = require('./conf/db')
@@ -17,6 +18,7 @@ const { REDIS_CONF } = require('./conf/db')
 onerror(app)
 
 // middlewares
+app.use(koaBody({ multipart: true })) // 解析formdata与文件格式
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
@@ -53,7 +55,7 @@ app.use(session({
 }))
 
 // routes
-app.use(interview.routes(), interview.allowedMethods())
+app.use(auth.routes(), auth.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 
 // error-handling

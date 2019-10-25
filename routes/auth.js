@@ -1,12 +1,10 @@
 const router = require('koa-router')()
 const loginCheck = require('../middleware/loginCheck')
-const Interview = require('../base/interview')
+const Interview = require('../base/auth')
 
-router.prefix('/interview')
+router.prefix('/auth')
 
 router.post('/login', Interview.login)  // 登录
-
-router.get('/list', loginCheck, Interview.list) // 获取列表
 
 module.exports = router
 
