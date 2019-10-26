@@ -17,4 +17,10 @@ router.get('/sign/list', User.signList)     // 获取签到者列表
 
 router.get('/sign/del', User.delSignUser)   // 删除签到者
 
+router.get('/search', User.search)  // 搜索面试者
+
+router.get('/getResult', User.getResult)  // 查询面试结果
+
+router.post('/setResult', User.setResult)   // 编写面试结果
+
 module.exports = router

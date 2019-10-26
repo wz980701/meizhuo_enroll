@@ -13,36 +13,34 @@ const addUser = async (user_data) => {  // 面试者线上报名
     })
     sql += `${_timeToTimestamp()});`
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
-    }
+    if (data.affectedRows > 0) return true
     return false
 }
 
 // 默认limit为20，page为1
 const getList = async ({ group, page = 1, limit = 20, state }) => {
-    let start = (page - 1) * limit
-    let condition = group ? `s_department=${group} and s_state=${state}` 
+    const start = (page - 1) * limit,
+        condition = group ? `s_department=${group} and s_state=${state}` 
                           :  `s_state=${state}`    // 判断是否有group参数
-    let sql_1 = `
+    const sql_list = `
         select 
         id, s_id, s_name, s_major, s_grade, s_department, s_createtime, s_apply
         from user where ${condition}
         order by s_createtime limit ${start}, ${limit};
     `
-    let sql_2 = `
+    const sql_sum = `
         select count(*) as sum from user where ${condition}
     `
-    const user_list = await exec(sql_1)
-    const user_num = await exec(sql_2)
+    const user_list = await exec(sql_list)
+    const user_num = await exec(sql_sum)
     return {
-        user_list,
+        user_list: user_list || [],
         sum: user_num[0].sum || 0
     }
 }
 
 const getDetail = async (id) => {
-    let sql = `
+    const sql = `
         select
         s_id, s_name, s_major, s_grade, s_department, s_number, s_intro, s_apply, s_state
         from user where id=${id};
@@ -52,18 +50,16 @@ const getDetail = async (id) => {
 }
 
 const checkUser = async (id) => {
-    let sql = `
+    const sql = `
         update user set s_state='已签到' where s_id=${id};
     `
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
-    }
+    if (data.affectedRows > 0) return true
     return false
 }
 
 const toSignIn = async (id) => {
-    let sql = `
+    const sql = `
         insert into sign_list
         (s_department, s_name, s_id, s_state)
         select 
@@ -71,14 +67,12 @@ const toSignIn = async (id) => {
         from user where s_id=${id};
     `
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
-    }
+    if (data.affectedRows > 0) return true
     return false
 }
 
 const addOfflineUser = async ({name, id, group}) => {
-    let sql = `
+    const sql = `
         insert into user
         (s_name, s_id, s_department, s_createtime, s_state, s_apply)
         values (
@@ -86,9 +80,7 @@ const addOfflineUser = async ({name, id, group}) => {
         );
     `
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
-    }
+    if (data.affectedRows > 0) return true
     return false
 }
 
@@ -96,7 +88,7 @@ const getSignList = async () => {
     const keys = await getDepartmentList()
     let data = {}
     for (let item of keys) {    //  遍历组别列表
-        let sql = `
+        const sql = `
             select s_id, s_name, s_state from sign_list where s_department='${item.d_name}';
         `
         const val = await exec(sql) // 根据所报组别不同获取列表
@@ -106,7 +98,7 @@ const getSignList = async () => {
 }
 
 const getDepartmentList = async () => {
-    let sql = `
+    const sql = `
         select d_name from department;
     `
     const data = await exec(sql)
@@ -114,13 +106,48 @@ const getDepartmentList = async () => {
 }
 
 const delFromSignList = async (id) => {
-    let sql = `
+    const sql = `
         delete from sign_list where s_id=${id};
     `
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
+    if (data.affectedRows > 0) return true
+    return false
+}
+
+const getSearchResult = async ({val, page = 1, limit = 20}) => {
+    const start = (page - 1) * limit,
+          condition = `s_id like '%${val}%' or s_name like '%${val}%'`
+    const sql_list = `
+        select 
+        id, s_id, s_name, s_major, s_grade, s_department, s_createtime, s_apply
+        from user
+        where ${condition} order by s_createtime limit ${start}, ${limit};
+    `,
+          sql_sum = `
+        select count(*) as sum from user where ${condition};
+    `
+    const list = await exec(sql_list),
+          sum = await exec(sql_sum)
+    return {
+        data: list || [],
+        sum: sum[0].sum || 0
     }
+}
+
+const getInterviewResult = async (id) => {
+    const sql = `
+        select s_result from user where s_id = ${id};
+    `
+    const data = await exec(sql)
+    return data[0] || {}
+}
+
+const setInterviewResult = async (id, result) => {
+    const sql = `
+        update user set s_result=${result} where s_id=${id};
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) return true
     return false
 }
 
@@ -132,5 +159,8 @@ module.exports = {
     toSignIn,
     addOfflineUser,
     getSignList,
-    delFromSignList
+    delFromSignList,
+    getSearchResult,
+    getInterviewResult,
+    setInterviewResult
 }

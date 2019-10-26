@@ -7,7 +7,10 @@ const {
     toSignIn,
     addOfflineUser,
     getSignList,
-    delFromSignList
+    delFromSignList,
+    getSearchResult,
+    getInterviewResult,
+    setInterviewResult
 } = require('../controller/user')
 const { _deepCopy, _returnVal } = require('../utils/_common')
 
@@ -79,6 +82,33 @@ class User {
         ctx.body = _returnVal({
             successMsg: '删除成功',
             failMsg: '删除失败',
+            data: val
+        })
+    }
+    async search (ctx, next) {
+        const val = await getSearchResult(ctx.query)
+        ctx.body = _returnVal({
+            passData: true,
+            successMsg: '搜索成功',
+            failMsg: '搜索失败',
+            data: val
+        })
+    }
+    async getResult (ctx, next) {
+        const val = await getInterviewResult(ctx.query.id)
+        ctx.body = _returnVal({
+            passData: true,
+            successMsg: '获取成功',
+            failMsg: '获取失败',
+            data: val
+        })
+    }
+    async setResult (ctx, next) {
+        const { id, result } = ctx.request.body
+        const val = await setInterviewResult(id, result)
+        ctx.body = _returnVal({
+            successMsg: '更新成功',
+            failMsg: '更新失败',
             data: val
         })
     }

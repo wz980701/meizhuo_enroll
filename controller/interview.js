@@ -1,7 +1,7 @@
 const { exec } = require('../db/mysql')
 
 const getNextUser = async () => {
-    let sql = `
+    const sql = `
         select 
         s_id, s_name, s_major, s_grade, s_department, s_number, s_intro, s_apply, s_state 
         from user
@@ -14,23 +14,21 @@ const getNextUser = async () => {
 }
 
 const toChangeState = async (id, state) => {
-    let sql = `
+    const sql = `
         update 
         user, sign_list 
         set user.s_state='${state}',sign_list.s_state='${state}'
         where user.s_id=${id} and user.s_id=sign_list.s_id;
     `
     const data = await exec(sql)
-    if (data.affectedRows > 0) {
-        return true
-    }
+    if (data.affectedRows > 0) return true
     return false
 }
 
 const toLogin = async (department, group) => {
     const is_exist = await checkLogin(department, group)
     if (!is_exist) {    // 如果没有登录，则插入到列表中
-        let sql = `
+        const sql = `
             insert into interviewer_list
             (h_department, h_group) values
             (${department}, ${group});
@@ -43,7 +41,7 @@ const toLogin = async (department, group) => {
 }
 
 const checkLogin = async (department, group) => {   // 判断是否已经登录了的
-    let sql = `
+    const sql = `
         select 1 from interviewer_list
         where h_department=${department} and h_group=${group} limit 1;
     `
@@ -53,22 +51,22 @@ const checkLogin = async (department, group) => {   // 判断是否已经登录�
 }
 
 const getList = async () => { 
-    let sql1 = `
+    const sql_list = `
         select h_group, h_department from interviewer_list
     `
-    let sql2 = `
+    const sql_sum = `
         select count(*) as sum from interviewer_list
     `
-    const list = await exec(sql1)
-    const sum = await exec(sql2)
+    const list = await exec(sql_list)
+    const sum = await exec(sql_sum)
     return {
-        data: list,
+        data: list || [],
         sum: sum[0].sum
-    } || {}
+    }
 }
 
 const toLogout = async (department, group) => {
-    let sql = `
+    const sql = `
         delete from interviewer_list where
         h_department=${department} and h_group=${group};
     `
