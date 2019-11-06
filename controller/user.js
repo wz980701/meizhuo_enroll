@@ -5,11 +5,12 @@ const { _timeToTimestamp } = require('../utils/_common')
 const addUser = async (user_data) => {  // 面试者线上报名
     let sql = `
         insert into user 
-        (s_name, s_id, s_major, s_number, s_grade, s_department, s_intro, s_createtime)
-        values (
+        (s_department, s_grade, s_name, s_id, s_major, s_number, s_intro, s_createtime)
+        values
+        (
     `
     Object.keys(user_data).forEach((key) => {
-        sql += `${user_data[key]},`
+        sql += `'${user_data[key]}',`
     })
     sql += `${_timeToTimestamp()});`
     const data = await exec(sql)
@@ -85,11 +86,11 @@ const addOfflineUser = async ({name, id, group}) => {
 }
 
 const getSignList = async () => {
-    const keys = await getDepartmentList()
+    const arr = await getDepartmentList()
     let data = {}
-    for (let item of keys) {    //  遍历组别列表
+    for (let item of arr) {    //  遍历组别列表
         const sql = `
-            select s_id, s_name, s_state from sign_list where s_department='${item.d_name}';
+            select s_id, s_name, s_state from sign_list where s_department='${item}';
         `
         const val = await exec(sql) // 根据所报组别不同获取列表
         data[item.d_name] = val
@@ -102,7 +103,10 @@ const getDepartmentList = async () => {
         select d_name from department;
     `
     const data = await exec(sql)
-    return data || []
+    const arr = data.map((item) => {
+        return item["d_name"]
+    })
+    return arr || []
 }
 
 const delFromSignList = async (id) => {
@@ -151,6 +155,28 @@ const setInterviewResult = async (id, result) => {
     return false
 }
 
+const getGradeList = async () => {
+    const sql = `
+        select g_name from grade;
+    `
+    const data = await exec(sql)
+    const arr = data.map((item) => {
+        return item["g_name"]
+    })
+    return arr || []
+}
+
+const getGroupList = async () => {
+    const sql = `
+        select h_group from interviewer_group;
+    `
+    const data = await exec(sql)
+    const arr = data.map((item) => {
+        return item["h_group"]
+    })
+    return arr || []
+}
+
 module.exports = {
     addUser,
     getList,
@@ -162,5 +188,8 @@ module.exports = {
     delFromSignList,
     getSearchResult,
     getInterviewResult,
-    setInterviewResult
+    setInterviewResult,
+    getDepartmentList,
+    getGradeList,
+    getGroupList
 }

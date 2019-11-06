@@ -8,7 +8,9 @@ const koaBody = require('koa-body')
 const logger = require('koa-logger')
 const session = require('koa-generic-session')
 const redisStore = require('koa-redis')
+const cors = require('koa2-cors')
 
+//  路由
 const auth = require('./routes/auth')
 const user = require('./routes/user')
 const interview = require('./routes/interview')
@@ -30,6 +32,16 @@ app.use(require('koa-static')(__dirname + '/public'))
 app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
+
+app.use(
+  cors({
+    maxAge: 5,
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept'], 
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization']
+  })
+)
 
 // logger
 app.use(async (ctx, next) => {

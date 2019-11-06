@@ -20,6 +20,19 @@ var port = normalizePort(process.env.PORT || '3000');
  */
 
 var server = http.createServer(app.callback());
+// var io = require('socket.io')(server, {
+//   pingInterval: 10000,
+//   pingTimeout: 5000
+// })
+
+// const {
+//   WSMiddle
+// } = require('../ws/index')
+
+// io.on('connection', (socket) => {
+//   console.log('connected')
+//   WSMiddle(socket)
+// })
 
 /**
  * Listen on provided port, on all network interfaces.

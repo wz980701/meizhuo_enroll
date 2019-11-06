@@ -31,7 +31,7 @@ const toLogin = async (department, group) => {
         const sql = `
             insert into interviewer_list
             (h_department, h_group) values
-            (${department}, ${group});
+            ('${department}', ${group});
         `
         const data = await exec(sql)
         if (data.affectedRows > 0)
@@ -43,7 +43,7 @@ const toLogin = async (department, group) => {
 const checkLogin = async (department, group) => {   // 判断是否已经登录了的
     const sql = `
         select 1 from interviewer_list
-        where h_department=${department} and h_group=${group} limit 1;
+        where h_department='${department}' and h_group=${group} limit 1;
     `
     const data = await exec(sql)
     if (data.length > 0) return true

@@ -10,7 +10,10 @@ const {
     delFromSignList,
     getSearchResult,
     getInterviewResult,
-    setInterviewResult
+    setInterviewResult,
+    getGradeList,
+    getDepartmentList,
+    getGroupList
 } = require('../controller/user')
 const { _deepCopy, _returnVal } = require('../utils/_common')
 
@@ -19,6 +22,7 @@ class User {
     }
     async apply (ctx, next) {
         const user_data = _deepCopy(ctx.request.body)
+        console.log(user_data)
         const val = await addUser(user_data)
         ctx.body = _returnVal({
             successMsg: '报名成功',
@@ -109,6 +113,33 @@ class User {
         ctx.body = _returnVal({
             successMsg: '更新成功',
             failMsg: '更新失败',
+            data: val
+        })
+    }
+    async gradeList (ctx, next) {
+        const val = await getGradeList()
+        ctx.body = _returnVal({
+            passData: true,
+            successMsg: '获取成功',
+            failMsg: '获取失败',
+            data: val
+        })
+    }
+    async departmentList (ctx, next) {
+        const val = await getDepartmentList()
+        ctx.body = _returnVal({
+            passData: true,
+            successMsg: '获取成功',
+            failMsg: '获取失败',
+            data: val
+        })
+    }
+    async groupList (ctx, next) {
+        const val = await getGroupList()
+        ctx.body = _returnVal({
+            passData: true,
+            successMsg: '获取列表成功',
+            failMsg: '获取列表失败',
             data: val
         })
     }

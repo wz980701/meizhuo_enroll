@@ -1,5 +1,4 @@
 const router = require('koa-router')()
-const loginCheck = require('../middleware/loginCheck')
 const Interview = require('../base/auth')
 
 router.prefix('/auth')

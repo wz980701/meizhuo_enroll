@@ -23,4 +23,10 @@ router.get('/getResult', User.getResult)  // 查询面试结果
 
 router.post('/setResult', User.setResult)   // 编写面试结果
 
+router.get('/gradeList', User.gradeList)    // 获取年级列表
+
+router.get('/departmentList', User.departmentList)  // 获取组别列表
+
+router.get('/groupList', User.groupList)    // 获取组数列表
+
 module.exports = router
