@@ -2,9 +2,23 @@ const mysql = require('mysql')
 
 const { MYSQL_CONF } = require('../conf/db')
 
-const con = mysql.createConnection(MYSQL_CONF)  // 建立连接
+function handleError (err) {
+    if (err) {
+      if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+        connect();
+      } else {
+        console.log(err.stack || err);
+      }
+    }
+  }
+  
+function connect () {
+con = mysql.createPool(MYSQL_CONF)  // 创建连接
+con.on('error', handleError)
+}
 
-con.connect()   // 开始连接
+let con
+connect() // 开始连接
 
 function exec (sql) {  // 执行sql语句函数
     const promise = new Promise((resolve, reject) => {
