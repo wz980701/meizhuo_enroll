@@ -13,7 +13,8 @@ const {
     setInterviewResult,
     getGradeList,
     getDepartmentList,
-    getGroupList
+    getGroupList,
+    changePassState
 } = require('../controller/user')
 const { _deepCopy, _returnVal } = require('../utils/_common')
 
@@ -99,7 +100,7 @@ class User {
         })
     }
     async getResult (ctx, next) {
-        const val = await getInterviewResult(ctx.query.id)
+        const val = await getInterviewResult(ctx.query.value)
         ctx.body = _returnVal({
             passData: true,
             successMsg: '获取成功',
@@ -108,8 +109,8 @@ class User {
         })
     }
     async setResult (ctx, next) {
-        const { id, result } = ctx.request.body
-        const val = await setInterviewResult(id, result)
+        const { department, result, pass } = ctx.request.body
+        const val = await setInterviewResult(department, result, pass)
         ctx.body = _returnVal({
             successMsg: '更新成功',
             failMsg: '更新失败',
@@ -140,6 +141,15 @@ class User {
             passData: true,
             successMsg: '获取列表成功',
             failMsg: '获取列表失败',
+            data: val
+        })
+    }
+    async passState (ctx, next) {
+        const {id, state} = ctx.query
+        const val = await changePassState(id, state)
+        ctx.body = _returnVal({
+            successMsg: '修改面试者状态成功',
+            failMsg: '修改面试者状态失败',
             data: val
         })
     }

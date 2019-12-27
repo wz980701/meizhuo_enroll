@@ -5,9 +5,9 @@ let REDIS_CONF  // redis配置
 
 if (env === 'dev') {    // 生产环境
     MYSQL_CONF = {
-        host: 'localhost',
+        host: '47.103.12.86',
         user: 'root',
-        password: '123456',
+        password: '138290Wz..0',
         port: '3306',
         database: 'meizhuo_enroll'
     }

@@ -29,4 +29,6 @@ router.get('/departmentList', User.departmentList)  // 获取组别列表
 
 router.get('/groupList', User.groupList)    // 获取组数列表
 
+router.get('/passState', User.passState) // 修改面试者面试状态
+
 module.exports = router

@@ -19,18 +19,22 @@ const addUser = async (user_data) => {  // 面试者线上报名
 }
 
 // 默认limit为20，page为1
-const getList = async ({ group, page = 1, limit = 20, state }) => {
-    const start = (page - 1) * limit,
-        condition = group ? `s_department=${group} and s_state=${state}` 
-                          :  `s_state=${state}`    // 判断是否有group参数
+const getList = async ({ group, page = 1, limit = 10, state }) => {
+    const start = (page - 1) * limit
+    let condition
+    if (group) {
+        condition = state ? `where s_department='${group}' and s_state='${state}'` : `where s_department='${group}'`
+    } else {
+        condition = state ? `where s_state='${state}'` : ''
+    }
     const sql_list = `
         select 
-        id, s_id, s_name, s_major, s_grade, s_department, s_createtime, s_apply
-        from user where ${condition}
+        id, s_id, s_name, s_major, s_grade, s_department, s_createtime, s_apply, s_pass
+        from user ${condition}
         order by s_createtime limit ${start}, ${limit};
     `
     const sql_sum = `
-        select count(*) as sum from user where ${condition}
+        select count(*) as sum from user ${condition}
     `
     const user_list = await exec(sql_list)
     const user_num = await exec(sql_sum)
@@ -77,7 +81,7 @@ const addOfflineUser = async ({name, id, group}) => {
         insert into user
         (s_name, s_id, s_department, s_createtime, s_state, s_apply)
         values (
-            ${name}, ${id}, ${group}, ${_timeToTimestamp()}, '已签到', '线下报名'
+            '${name}', '${id}', '${group}', ${_timeToTimestamp()}, '已签到', '线下报名'
         );
     `
     const data = await exec(sql)
@@ -93,7 +97,7 @@ const getSignList = async () => {
             select s_id, s_name, s_state from sign_list where s_department='${item}';
         `
         const val = await exec(sql) // 根据所报组别不同获取列表
-        data[item.d_name] = val
+        data[item] = val
     }
     return data
 }
@@ -138,17 +142,18 @@ const getSearchResult = async ({val, page = 1, limit = 20}) => {
     }
 }
 
-const getInterviewResult = async (id) => {
+const getInterviewResult = async (value) => {
     const sql = `
-        select s_result from user where s_id = ${id};
+        select s_result from user where s_id = '${value}' or s_name = '${value}';
     `
     const data = await exec(sql)
     return data[0] || {}
 }
 
-const setInterviewResult = async (id, result) => {
+const setInterviewResult = async (department, result, pass) => {
     const sql = `
-        update user set s_result=${result} where s_id=${id};
+        update user set s_result='${result}' 
+        where s_department='${department}' and s_pass='${pass}' and s_state='已面试';
     `
     const data = await exec(sql)
     if (data.affectedRows > 0) return true
@@ -177,6 +182,15 @@ const getGroupList = async () => {
     return arr || []
 }
 
+const changePassState = async (id, state) => {
+    const sql = `
+        update user set s_pass='${state}' where id=${id}
+    `
+    const data = await exec(sql)
+    if (data.affectedRows > 0) return true
+    return false
+}
+
 module.exports = {
     addUser,
     getList,
@@ -191,5 +205,6 @@ module.exports = {
     setInterviewResult,
     getDepartmentList,
     getGradeList,
-    getGroupList
+    getGroupList,
+    changePassState
 }

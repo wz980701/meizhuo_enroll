@@ -18,19 +18,35 @@ class Interview {
         this.delSession = this.delSession.bind(this)
     }
     async nextUser (ctx, next) {
-        const user_data = await getNextUser()   // 获取sign_list已签到状态的第一条的具体数据
-        if (user_data) {    // 如果获取成功，则改变其状态
-            const res_prev = await this.changeState(ctx.query.id, '已面试'), // 面试完的
-                  res_next = await this.changeState(user_data.s_id, '面试中')   // 下一个要面试的
+        const user_data = await getNextUser(ctx.session.department)   // 获取sign_list已签到状态的第一条的具体数据
+        if (!ctx.query.id && user_data) {  // 如果没有id的话，则是面试官登陆后第一次请求
+            const res = await this.changeState(user_data.s_id, '面试中')
             ctx.body = _returnVal({
-                passData: res_prev && res_next,
+                passData: res,
                 successMsg: '获取信息成功',
                 failMsg: '获取信息失败',
                 data: user_data
             })
-        } else {
-            ctx.body = new ErrorModel('获取信息失败')
+            return
         }
+        if (JSON.stringify(user_data) === '{}' && ctx.query.id) { // 若是最后一个面试者，则将面试中修改为已修改
+            const res = await this.changeState(ctx.query.id, '已面试')
+            ctx.body = _returnVal({
+                passData: res,
+                successMsg: '修改状态成功',
+                failMsg: '修改状态失败',
+                data: user_data
+            })
+            return
+        }
+        const res_prev = await this.changeState(ctx.query.id, '已面试'), // 面试完的
+                res_next = await this.changeState(user_data.s_id, '面试中')   // 下一个要面试的
+        ctx.body = _returnVal({
+            passData: res_prev && res_next,
+            successMsg: '获取信息成功',
+            failMsg: '获取信息失败',
+            data: user_data
+        })
     }
     async changeState (id, state) { // 修改状态
         if (!id) return true    // 第一次登录时默认不传id
@@ -58,7 +74,10 @@ class Interview {
         })
     }
     async logout (ctx, next) {
-        const { department, group } = ctx.query
+        const { department, group, id } = ctx.query
+        if (id) { // 如果有传过来id，则说明退出时有面试者处于面试中状态，需将其转变为已面试
+            await this.changeState(id, '已面试')
+        }
         const data = await toLogout(department, group)
         this.delSession(ctx)
         ctx.body = _returnVal({
